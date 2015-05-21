@@ -1,7 +1,0 @@
-JMP 4
-DB 1
-JMP 8
-DB 2
-ADI 2
-STA 3
-HLT

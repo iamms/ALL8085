@@ -1,0 +1,5 @@
+LDA @3
+MOV B,A
+LDA @3
+ADD B
+STA @3
