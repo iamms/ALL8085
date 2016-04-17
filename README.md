@@ -1,7 +1,7 @@
 # ALL-8085
 
 A simple Assembler Linker Loader Simulator for subset of C language.
-Coverts in 8085 assembly language. Supports global variables and multiple file
+Converts in 8085 assembly language. Supports global variables and multiple file
 definitions.
 
 ## Dependencies
@@ -34,7 +34,7 @@ In `main.py`, add files in list x
 
 ## Example?
 
-Repo contains `sampleCode1.txt`, `sampleCode2.txt`, `sampleCode3` and `testcode.txt`.
+Repo contains SampleCodes dir in which there are `sampleCode1.txt`, `sampleCode2.txt`, `sampleCode3` and `testcode.txt`.
 
 # Instruction format
 
