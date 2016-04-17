@@ -1,46 +1,74 @@
 # ALL-8085
 
-How to run?
+A simple Assembler Linker Loader Simulator for subset of C language.
+Coverts in 8085 assembly language. Supports global variables and multiple file
+definitions.
 
-python manage.py
+## Dependencies
+### For GUI
+Tkinter Library
 
-How to specify files?
+### For command line
+None
 
-In main.py, add files in list x
+## File format?
 
-Instruction format
+In a txt file specify on separate line all the files you want to link.
+
+## How to run?
+
+`python3 gui.py`
+
+Pass the txt file which contains all the files in separate lines you want to assemble link and load.
+
+## How to simulate?
+
+`python3 sim.py`
+
+If you are coming from `gui.py` click on `open passed file` to simulate the
+compiled code, or to open another file click on `open another file`.
+
+## How to specify files for command line usage?
+
+In `main.py`, add files in list x
+
+## Example?
+
+Repo contains `sampleCode1.txt`, `sampleCode2.txt`, `sampleCode3` and `testcode.txt`.
+
+# Instruction format
 
 Initialization :
 
 Local:
 
-var a = 5
+`var a = 5`
 
 Global:
 
-glob a = 5
+`glob a = 5`
 
 From another file (External variable):
 
-extern a
+`extern a`
 
 Arthimetic
 
 add:
 
-a = b + c
+`a = b + c`
 
 sub:
 
-a = b - c
+`a = b - c`
 
 bit and
 
-a = b & c
+`a = b & c`
 
 bit or
 
-a = b | c
+`a = b | c`
 
 where a is a variable declared
 
@@ -48,7 +76,7 @@ b,c can be integers or variables
 
 Loop:
 
-loop count
+`loop count`
 
 //Instructions
 
@@ -58,13 +86,13 @@ loop count
 
 //Instructions
 
-endloop
+`endloop`
 
 where count is a variable (not integer!!)
 
 Conditional:
 
-if x>y
+`if x>y`
 
 //Instructions
 
@@ -75,11 +103,9 @@ if x>y
 
 //Instructions
 
-endif
+`endif`
 
-if x=y
-
-//Instructions
+`if x=y`
 
 //Instructions
 
@@ -87,8 +113,8 @@ if x=y
 
 //Instructions
 
-endloop
+//Instructions
+
+`endloop`
 
 x and y should be variables!!!!
-
-Sample code is code.xxx and code1.xxx
