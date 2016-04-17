@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Specific to ALL-8085
+*.l
+*.li
+*.ls
+*.loaded
+*.8085
+
 # C extensions
 *.so
 
