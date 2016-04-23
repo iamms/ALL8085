@@ -8,12 +8,6 @@ file_size= {}
 # def isvariable(line):
 # 	var = re.compile(r'var (.+*)=(.+*)')
 
-def calculatelen():
-	lines = open('lenopcodes.cf',"r").read().split('\n')
-	for line in lines :
-		line = line.lstrip().rstrip()
-		if line != '' :
-			opCode_len[line.split(' ')[0]] = int(line.split(' ')[1])
 
 def tryInt(s):
     try: 
@@ -23,7 +17,6 @@ def tryInt(s):
         return False
 
 def run( fileNames ):
-	calculatelen()
 	glo = re.compile(r'glob var (.*)=(.*)')
 	ext = re.compile(r'extern(.*)')
 	var = re.compile(r'var (.*)=(.*)')
@@ -36,6 +29,12 @@ def run( fileNames ):
 	ifgt = re.compile(r'if (.*)>(.*)')
 	ifgte = re.compile(r'endif(.*)')
 	ifeq = re.compile(r'if (.*)=(.*)')
+	
+	lines = open('lenopcodes.cf',"r").read().split('\n')
+	for line in lines:
+		if line != '' :
+			opCode_len[line.split(' ')[0]] = int(line.split(' ')[1])
+	
 	for fileName in fileNames :
 		inputFile = open(fileName, "r")
 		fileName = fileName.split('.')[0]
