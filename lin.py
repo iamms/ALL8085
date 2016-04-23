@@ -1,10 +1,10 @@
 import ass
 
-symTable = ass.symTable
+symbol_table = ass.symbol_table
 globTable = ass.globTable
-filelen = ass.filelen
+file_size= ass.file_size
 externtable = {}
-finalsymTable = {}
+finalsymbol_table = {}
 
 def getLoc(exter, fileNames):
 	for fileName in fileNames:
@@ -12,7 +12,7 @@ def getLoc(exter, fileNames):
 		for vari in globTable[fileName]:
 			# print vari
 			if vari == exter:
-				val = symTable[fileName][vari]
+				val = symbol_table[fileName][vari]
 				val = val.split('#')[1]
 				return (fileName,val)
 
@@ -21,7 +21,7 @@ def linker( fileNames ):
 	lastcount = 0
 	for fileName in fileNames:
 		startCount[fileName.split('.')[0]] = lastcount
-		lastcount += filelen[fileName.split('.')[0]]
+		lastcount += file_size[fileName.split('.')[0]]
 	for fileName in fileNames :
 		fileName = fileName.split('.')[0]
 		inputFile = open(fileName+'.li','r')
@@ -30,7 +30,7 @@ def linker( fileNames ):
 		outFile = open(fileName+'.loaded','w')
 		newCode = []
 		for line in lines :
-			line = line.lstrip().rstrip()
+			line = line
 			if '$' in line:
 				exter = line.split(' ')[1].split('$')[1]
 				x, y = getLoc(exter, fileNames)
@@ -51,7 +51,7 @@ def linker( fileNames ):
 		code = inputFile.read()
 		lines = code.split('\n')
 		for line in lines :
-			line = line.lstrip().rstrip()
+			line = line
 			if '#' in line:
 				tag = line.split(' ')[1]
 				newtag = '#' + str((int(tag.split('#')[1]) + startCount[fileName]))

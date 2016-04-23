@@ -1,9 +1,10 @@
 import ass,lin,loader
 
-x = []
+x = ['sampleCode1.txt']
+
 
 def runass():
-	ass.test(x)
+	ass.run(x)
 def runlin():
 	lin.linker(x)
 def runload():

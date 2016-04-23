@@ -1,21 +1,19 @@
 import re
 
-oplen = {}
-symTable = {}
+opCode_len = {}
+symbol_table = {}
 globTable = {}
-filelen = {}
+file_size= {}
 
-def isvariable(line):
-	var = re.compile(r'var (.+*)=(.+*)')
+# def isvariable(line):
+# 	var = re.compile(r'var (.+*)=(.+*)')
 
 def calculatelen():
-	inputFile = open('lenopcodes.cf',"r")
-	code = inputFile.read()
-	lines = code.split('\n')
+	lines = open('lenopcodes.cf',"r").read().split('\n')
 	for line in lines :
 		line = line.lstrip().rstrip()
 		if line != '' :
-			oplen[line.split(' ')[0]] = int(line.split(' ')[1])
+			opCode_len[line.split(' ')[0]] = int(line.split(' ')[1])
 
 def tryInt(s):
     try: 
@@ -24,7 +22,7 @@ def tryInt(s):
     except ValueError:
         return False
 
-def test( fileNames ):
+def run( fileNames ):
 	calculatelen()
 	glo = re.compile(r'glob var (.*)=(.*)')
 	ext = re.compile(r'extern(.*)')
@@ -49,23 +47,23 @@ def test( fileNames ):
 		loopctr = 0
 		ifctr = 0
 		ifjmp = {}
-		symTable[fileName] = {}
+		symbol_table[fileName] = {}
 		globTable[fileName] = {}
 		for line in lines :
 			line = line.lstrip().rstrip()
 			if var.match(line):
-				symTable[fileName][var.match(line).group(1).lstrip().rstrip()] = '#'+str(memaddr + 3)
+				symbol_table[fileName][var.match(line).group(1).lstrip().rstrip()] = '#'+str(memaddr + 3)
 				newCode.append('JMP #'+str(memaddr+4))
 				newCode.append('DB '+var.match(line).group(2).lstrip().rstrip())
 				memaddr = memaddr + 4
 			elif glo.match(line):
-				symTable[fileName][glo.match(line).group(1).lstrip().rstrip()] = '#'+str(memaddr + 3)
+				symbol_table[fileName][glo.match(line).group(1).lstrip().rstrip()] = '#'+str(memaddr + 3)
 				globTable[fileName][glo.match(line).group(1).lstrip().rstrip()] = '#'+str(memaddr + 3)
 				newCode.append('JMP #'+str(memaddr+4))
 				newCode.append('DB '+glo.match(line).group(2).lstrip().rstrip())
 				memaddr = memaddr + 4
 			elif ext.match(line):
-				symTable[fileName][ext.match(line).group(1).lstrip().rstrip()] = '$'+str(ext.match(line).group(1).lstrip().rstrip())
+				symbol_table[fileName][ext.match(line).group(1).lstrip().rstrip()] = '$'+str(ext.match(line).group(1).lstrip().rstrip())
 			elif add.match(line):
 				x = add.match(line).group(1).lstrip().rstrip()
 				y = add.match(line).group(2).lstrip().rstrip()
@@ -73,35 +71,35 @@ def test( fileNames ):
 				if tryInt(y) and tryInt(z):
 					newCode.append('MVI A,'+y)
 					newCode.append('ADI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['MVI']
-					memaddr += oplen['ADI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['MVI']
+					memaddr += opCode_len['ADI']
+					memaddr += opCode_len['STA']
 				elif tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('ADI '+y)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['ADI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ADI']
+					memaddr += opCode_len['STA']
 				elif tryInt(z) and not tryInt(y):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('ADI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['ADI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ADI']
+					memaddr += opCode_len['STA']
 				elif not tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('MOV B,A')
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('ADD B')
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['MOV']
-					memaddr += oplen['LDA']
-					memaddr += oplen['ADD']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['MOV']
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ADD']
+					memaddr += opCode_len['STA']
 			elif sub.match(line):
 				x = sub.match(line).group(1).lstrip().rstrip()
 				y = sub.match(line).group(2).lstrip().rstrip()
@@ -109,35 +107,35 @@ def test( fileNames ):
 				if tryInt(y) and tryInt(z):
 					newCode.append('MVI A,'+y)
 					newCode.append('SUI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['MVI']
-					memaddr += oplen['SUI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['MVI']
+					memaddr += opCode_len['SUI']
+					memaddr += opCode_len['STA']
 				elif tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('SUI '+y)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['SUI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['SUI']
+					memaddr += opCode_len['STA']
 				elif tryInt(z) and not tryInt(y):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('SUI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['SUI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['SUI']
+					memaddr += opCode_len['STA']
 				elif not tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('MOV B,A')
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('SUB B')
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['MOV']
-					memaddr += oplen['LDA']
-					memaddr += oplen['SUB']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['MOV']
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['SUB']
+					memaddr += opCode_len['STA']
 			elif ana.match(line):
 				x = ana.match(line).group(1).lstrip().rstrip()
 				y = ana.match(line).group(2).lstrip().rstrip()
@@ -145,35 +143,35 @@ def test( fileNames ):
 				if tryInt(y) and tryInt(z):
 					newCode.append('MVI A,'+y)
 					newCode.append('ANI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['MVI']
-					memaddr += oplen['ANI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['MVI']
+					memaddr += opCode_len['ANI']
+					memaddr += opCode_len['STA']
 				elif tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('ANI '+y)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['ANI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ANI']
+					memaddr += opCode_len['STA']
 				elif tryInt(z) and not tryInt(y):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('ANI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['ANI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ANI']
+					memaddr += opCode_len['STA']
 				elif not tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('MOV B,A')
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('ANA B')
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['MOV']
-					memaddr += oplen['LDA']
-					memaddr += oplen['ANA']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['MOV']
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ANA']
+					memaddr += opCode_len['STA']
 			elif ora.match(line):
 				x = ora.match(line).group(1).lstrip().rstrip()
 				y = ora.match(line).group(2).lstrip().rstrip()
@@ -181,99 +179,99 @@ def test( fileNames ):
 				if tryInt(y) and tryInt(z):
 					newCode.append('MVI A,'+y)
 					newCode.append('ORI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['MVI']
-					memaddr += oplen['ORI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['MVI']
+					memaddr += opCode_len['ORI']
+					memaddr += opCode_len['STA']
 				elif tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('ORI '+y)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['ORI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ORI']
+					memaddr += opCode_len['STA']
 				elif tryInt(z) and not tryInt(y):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('ORI '+z)
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['ORI']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ORI']
+					memaddr += opCode_len['STA']
 				elif not tryInt(y) and not tryInt(z):
-					newCode.append('LDA '+str(symTable[fileName][y]))
+					newCode.append('LDA '+str(symbol_table[fileName][y]))
 					newCode.append('MOV B,A')
-					newCode.append('LDA '+str(symTable[fileName][z]))
+					newCode.append('LDA '+str(symbol_table[fileName][z]))
 					newCode.append('ORA B')
-					newCode.append('STA '+str(symTable[fileName][x]))
-					memaddr += oplen['LDA']
-					memaddr += oplen['MOV']
-					memaddr += oplen['LDA']
-					memaddr += oplen['ORA']
-					memaddr += oplen['STA']
+					newCode.append('STA '+str(symbol_table[fileName][x]))
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['MOV']
+					memaddr += opCode_len['LDA']
+					memaddr += opCode_len['ORA']
+					memaddr += opCode_len['STA']
 			elif slop.match(line):
 				x = slop.match(line).group(1).lstrip().rstrip()
 				if tryInt(x):
 					newCode.append('PUSH D')
 					newCode.append('MVI E,'+x)
-					memaddr += oplen['PUSH']
-					memaddr += oplen['MVI']
-					symTable[fileName][loopctr] = '#' + str(memaddr)
+					memaddr += opCode_len['PUSH']
+					memaddr += opCode_len['MVI']
+					symbol_table[fileName][loopctr] = '#' + str(memaddr)
 					loopctr += 1
 				# else:
 				# 	newCode.append('PUSH E')
-				# 	newCode.append('MVI E,'+str(symTable[fileName][x]))
-				# 	memaddr += oplen['PUSH']
-				# 	memaddr += oplen['MVI']
-				# 	symTable[fileName][loopctr] = memaddr
+				# 	newCode.append('MVI E,'+str(symbol_table[fileName][x]))
+				# 	memaddr += opCode_len['PUSH']
+				# 	memaddr += opCode_len['MVI']
+				# 	symbol_table[fileName][loopctr] = memaddr
 				# 	loopctr += 1
 			elif elop.match(line):
 				newCode.append('MOV A,E')
 				newCode.append('SUI 1')
 				newCode.append('MOV E,A')
-				newCode.append('JNZ '+str(symTable[fileName][loopctr-1]))
+				newCode.append('JNZ '+str(symbol_table[fileName][loopctr-1]))
 				newCode.append('POP D')
 				loopctr -= 1
-				memaddr += oplen['MOV']
-				memaddr += oplen['SUI']
-				memaddr += oplen['MOV']
-				memaddr += oplen['JNZ']
-				memaddr += oplen['POP']
+				memaddr += opCode_len['MOV']
+				memaddr += opCode_len['SUI']
+				memaddr += opCode_len['MOV']
+				memaddr += opCode_len['JNZ']
+				memaddr += opCode_len['POP']
 			elif ifgt.match(line):
 				x = ifgt.match(line).group(1).lstrip().rstrip()
 				y = ifgt.match(line).group(2).lstrip().rstrip()
-				newCode.append('LDA '+str(symTable[fileName][x]))
+				newCode.append('LDA '+str(symbol_table[fileName][x]))
 				newCode.append('MOV B,A')
-				newCode.append('LDA '+str(symTable[fileName][y]))
+				newCode.append('LDA '+str(symbol_table[fileName][y]))
 				newCode.append('SUB B')
 				newCode.append('JP &&&'+str(ifctr))
 				newCode.append('JZ &&&'+str(ifctr))
 				ifctr += 1
-				memaddr += oplen['LDA']
-				memaddr += oplen['MOV']
-				memaddr += oplen['LDA']
-				memaddr += oplen['SUB']
-				memaddr += oplen['JP']
-				memaddr += oplen['JZ']
+				memaddr += opCode_len['LDA']
+				memaddr += opCode_len['MOV']
+				memaddr += opCode_len['LDA']
+				memaddr += opCode_len['SUB']
+				memaddr += opCode_len['JP']
+				memaddr += opCode_len['JZ']
 			elif ifeq.match(line):
 				x = ifeq.match(line).group(1).lstrip().rstrip()
 				y = ifeq.match(line).group(2).lstrip().rstrip()
-				newCode.append('LDA '+str(symTable[fileName][x]))
+				newCode.append('LDA '+str(symbol_table[fileName][x]))
 				newCode.append('MOV B,A')
-				newCode.append('LDA '+str(symTable[fileName][y]))
+				newCode.append('LDA '+str(symbol_table[fileName][y]))
 				newCode.append('SUB B')
 				newCode.append('JNZ &&&'+str(ifctr))
 				ifctr += 1
-				memaddr += oplen['LDA']
-				memaddr += oplen['MOV']
-				memaddr += oplen['LDA']
-				memaddr += oplen['SUB']
-				memaddr += oplen['JNZ']
+				memaddr += opCode_len['LDA']
+				memaddr += opCode_len['MOV']
+				memaddr += opCode_len['LDA']
+				memaddr += opCode_len['SUB']
+				memaddr += opCode_len['JNZ']
 			elif ifgte.match(line):
 				ifjmp[ifctr-1] = memaddr
 			
 		outFile.write('\n'.join(newCode))
 		outFile.close()
-		filelen[fileName] = memaddr
+		file_size[fileName] = memaddr
 		################################
 		inputFile = open(fileName+'.l','r')
 		code = inputFile.read()

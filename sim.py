@@ -23,7 +23,7 @@ reg['SP'] = 0
 PC = 0
 stack = []
 
-oplen = {}
+opCode_len = {}
 dbloc = []
 
 def calculatelen():
@@ -31,9 +31,9 @@ def calculatelen():
 	code = inputFile.read()
 	lines = code.split('\n')
 	for line in lines :
-		line = line.lstrip().rstrip()
+		line = line
 		if line != '' :
-			oplen[line.split(' ')[0]] = int(line.split(' ')[1])
+			opCode_len[line.split(' ')[0]] = int(line.split(' ')[1])
 
 calculatelen()
 memory = {}
@@ -44,12 +44,12 @@ def load(filename):
 	lines = code.split('\n')
 	mem = 0
 	for line in lines :
-		op = line.split(' ')[0].lstrip().rstrip()
+		op = line.split(' ')[0]
 		if op != 'DB':
 			memory[mem] = line
-			mem += oplen[op]
+			mem += opCode_len[op]
 		else:
-			memory[mem] = int(line.split(' ')[1].lstrip().rstrip())
+			memory[mem] = int(line.split(' ')[1])
 			dbloc.append(mem)
 			mem += 1
 
@@ -91,76 +91,76 @@ def simulator(pc = 0):
 		print (nextinst)
 		print (PC)
 	elif opcode == 'MVI':
-		regvar = inst.split(' ')[1].split(',')[0].lstrip().rstrip()
-		reg[regvar] = int(inst.split(' ')[1].split(',')[1].lstrip().rstrip())
-		PC = pc + int(oplen[opcode])
+		regvar = inst.split(' ')[1].split(',')[0]
+		reg[regvar] = int(inst.split(' ')[1].split(',')[1])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'ADI':
 		reg['A'] = int(reg['A']) + int(inst.split(' ')[1])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'STA':
 		memloc = int(inst.split(' ')[1])
 		memory[memloc] = int(reg['A'])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'LDA':
 		memloc = int(inst.split(' ')[1])
 		reg['A'] = int(memory[memloc])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'MOV':
-		destreg = inst.split(' ')[1].split(',')[0].lstrip().rstrip()
-		srcreg = inst.split(' ')[1].split(',')[1].lstrip().rstrip()
+		destreg = inst.split(' ')[1].split(',')[0]
+		srcreg = inst.split(' ')[1].split(',')[1]
 		reg[destreg] = reg[srcreg]
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'ADD':
 		srcreg = inst.split(' ')[1]
 		reg['A'] = int(reg['A']) + int(reg[srcreg])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'SUI':
 		reg['A'] = int(reg['A']) - int(inst.split(' ')[1])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'SUB':
 		srcreg = inst.split(' ')[1]
 		reg['A'] = int(reg['A']) - int(reg[srcreg])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'ANI':
 		reg['A'] = int(reg['A']) & int(inst.split(' ')[1])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'ANA':
 		srcreg = inst.split(' ')[1]
 		reg['A'] = int(reg['A']) & int(reg[srcreg])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'ORI':
 		reg['A'] = int(reg['A']) | int(inst.split(' ')[1])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'ORA':
 		srcreg = inst.split(' ')[1]
 		reg['A'] = int(reg['A']) | int(reg[srcreg])
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'PUSH':
 		srcreg = inst.split(' ')[1]
 		stack.append(int(reg[srcreg]))
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'POP':
 		srcreg = inst.split(' ')[1]
 		reg[srcreg] = stack.pop()
-		PC = pc + int(oplen[opcode])
+		PC = pc + int(opCode_len[opcode])
 	elif opcode == 'JNZ':
 		nextinst = int(inst.split(' ')[1])
 		if int(reg['A']) != 0:
 			PC = nextinst
 		else:
-			PC = pc + int(oplen[opcode])
+			PC = pc + int(opCode_len[opcode])
 	elif opcode == 'JZ':
 		nextinst = int(inst.split(' ')[1])
 		if int(reg['A']) == 0:
 			PC = nextinst
 		else:
-			PC = pc + int(oplen[opcode])
+			PC = pc + int(opCode_len[opcode])
 	elif opcode == 'JP':
 		nextinst = int(inst.split(' ')[1])
 		if int(reg['A']) > 0:
 			PC = nextinst
 		else:
-			PC = pc + int(oplen[opcode])
+			PC = pc + int(opCode_len[opcode])
 	reg['PC'] = PC
 
 def callbackf():
