@@ -1,10 +1,10 @@
-def loader( fileNames ):
+def loader( files ):
 	offset = 0
-	fileName = fileNames[0].split('.')[0]
-	inputFile = open(fileName+'.ls','r')
+	fl = files[0].split('.')[0]
+	inputFile = open(fl+'.ls','r')
 	code = inputFile.read()
 	lines = code.split('\n')
-	outFile = open(fileName+'.8085','w')
+	outFile = open(fl+'.8085','w')
 	linkCode = []
 	for line in lines :
 		if '#' in line:

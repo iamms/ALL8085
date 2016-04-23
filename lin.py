@@ -6,34 +6,34 @@ file_size= ass.file_size
 externtable = {}
 finalsymbol_table = {}
 
-def getLoc(exter, fileNames):
-	for fileName in fileNames:
-		fileName = fileName.split('.')[0]
-		for vari in globTable[fileName]:
+def getLoc(exter, files):
+	for fl in files:
+		fl = fl.split('.')[0]
+		for vari in globTable[fl]:
 			# print vari
 			if vari == exter:
-				val = symbol_table[fileName][vari]
+				val = symbol_table[fl][vari]
 				val = val.split('#')[1]
-				return (fileName,val)
+				return (fl,val)
 
-def linker( fileNames ):
+def linker( files ):
 	startCount = {}
 	lastcount = 0
-	for fileName in fileNames:
-		startCount[fileName.split('.')[0]] = lastcount
-		lastcount += file_size[fileName.split('.')[0]]
-	for fileName in fileNames :
-		fileName = fileName.split('.')[0]
-		inputFile = open(fileName+'.li','r')
+	for fl in files:
+		startCount[fl.split('.')[0]] = lastcount
+		lastcount += file_size[fl.split('.')[0]]
+	for fl in files :
+		fl = fl.split('.')[0]
+		inputFile = open(fl+'.li','r')
 		code = inputFile.read()
 		lines = code.split('\n')
-		outFile = open(fileName+'.loaded','w')
+		outFile = open(fl+'.loaded','w')
 		newCode = []
 		for line in lines :
 			line = line
 			if '$' in line:
 				exter = line.split(' ')[1].split('$')[1]
-				x, y = getLoc(exter, fileNames)
+				x, y = getLoc(exter, files)
 				newLine = line.replace('$'+exter, '@' + str(int(startCount[x]+int(y))))
 				newCode.append(newLine)
 			else:
@@ -42,19 +42,19 @@ def linker( fileNames ):
 		outFile.write('\n'.join(newCode))
 		outFile.close()
 
-	outFile = open(fileNames[0].split('.')[0]+'.ls','w')
+	outFile = open(files[0].split('.')[0]+'.ls','w')
 	linkCode = []
 	progCount = 0
-	for fileName in fileNames :
-		fileName = fileName.split('.')[0]
-		inputFile = open(fileName+'.loaded','r')
+	for fl in files :
+		fl = fl.split('.')[0]
+		inputFile = open(fl+'.loaded','r')
 		code = inputFile.read()
 		lines = code.split('\n')
 		for line in lines :
 			line = line
 			if '#' in line:
 				tag = line.split(' ')[1]
-				newtag = '#' + str((int(tag.split('#')[1]) + startCount[fileName]))
+				newtag = '#' + str((int(tag.split('#')[1]) + startCount[fl]))
 				linkCode.append(line.replace(tag, newtag))
 			elif '@' in line:
 				newtag = line.replace('@','#')
